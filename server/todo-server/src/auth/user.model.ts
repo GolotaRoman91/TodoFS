@@ -20,5 +20,5 @@ export class User extends Model<User> {
     type: DataType.STRING,
     allowNull: false,
   })
-  password: string;
+  passwordHash: string;
 }
