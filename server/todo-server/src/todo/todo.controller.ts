@@ -30,18 +30,25 @@ export class TodoController {
     return this.todoService.findAll(userEmail);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.todoService.findOne(+id);
+  findOne(@UserEmail() userEmail: string, @Param('id') id: string) {
+    return this.todoService.findOne(+id, userEmail);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateTodoDto: UpdateTodoDto) {
-    return this.todoService.update(+id, updateTodoDto);
+  update(
+    @UserEmail() userEmail: string,
+    @Param('id') id: string,
+    @Body() updateTodoDto: UpdateTodoDto,
+  ) {
+    return this.todoService.update(userEmail, +id, updateTodoDto);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.todoService.remove(+id);
+  remove(@UserEmail() userEmail: string, @Param('id') id: string) {
+    return this.todoService.remove(userEmail, +id);
   }
 }

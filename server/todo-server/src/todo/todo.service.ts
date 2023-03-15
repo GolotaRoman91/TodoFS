@@ -38,15 +38,59 @@ export class TodoService {
     });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} todo`;
+  async findOne(id: number, userEmail: string): Promise<TodoModel> {
+    const todo = await this.todoModel.findOne({
+      where: { id },
+      include: [{ model: UserModel, where: { email: userEmail } }],
+    });
+
+    if (!todo) {
+      throw new NotFoundException(`Todo with ID ${id} not found`);
+    }
+
+    return todo;
   }
 
-  update(id: number, updateTodoDto: UpdateTodoDto) {
-    return `This action updates a #${id} todo`;
+  async update(
+    userEmail: string,
+    id: number,
+    updateTodoDto: UpdateTodoDto,
+  ): Promise<TodoModel> {
+    const user = await this.userModel.findOne({ where: { email: userEmail } });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const todo = await this.todoModel.findOne({
+      where: { id, userId: user.id },
+    });
+
+    if (!todo) {
+      throw new NotFoundException(`Todo with ID ${id} not found`);
+    }
+
+    Object.assign(todo, updateTodoDto);
+    await todo.save();
+
+    return todo;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} todo`;
+  async remove(userEmail: string, id: number): Promise<void> {
+    const user = await this.userModel.findOne({ where: { email: userEmail } });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const todo = await this.todoModel.findOne({
+      where: { id, userId: user.id },
+    });
+
+    if (!todo) {
+      throw new NotFoundException(`Todo with ID ${id} not found`);
+    }
+
+    await todo.destroy();
   }
 }
