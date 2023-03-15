@@ -1,13 +1,14 @@
-import { Table, Column, Model, DataType } from 'sequelize-typescript';
+import { Table, Column, Model, DataType, HasMany } from 'sequelize-typescript';
+import { TodoModel } from '../todo/todo.model';
 
 @Table
 export class UserModel extends Model<UserModel> {
   @Column({
-    type: DataType.UUID,
-    defaultValue: DataType.UUIDV4,
+    type: DataType.INTEGER,
     primaryKey: true,
+    autoIncrement: true,
   })
-  id: string;
+  id: number;
 
   @Column({
     type: DataType.STRING,
@@ -21,4 +22,7 @@ export class UserModel extends Model<UserModel> {
     allowNull: false,
   })
   passwordHash: string;
+
+  @HasMany(() => TodoModel)
+  todos: TodoModel[];
 }
