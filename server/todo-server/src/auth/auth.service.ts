@@ -1,25 +1,50 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { InjectModel } from '@nestjs/sequelize';
-import * as bcrypt from 'bcryptjs';
+import { genSalt, hash, compare } from 'bcryptjs';
+import { USER_NOT_FOUND_ERROR, WRONG_PASSWORD_ERROR } from './auth.constants';
 import { AuthDto } from './dto/auth.dto';
-import { User } from './user.model';
+import { UserModel } from './user.model';
 
 @Injectable()
 export class AuthService {
-  constructor(@InjectModel(User) private userModel: typeof User) {}
-  async createUser(dto: AuthDto): Promise<User> {
-    const { email, password } = dto;
-    // const existingUser = await this.userModel.findOne({ where: { email } });
-    // if (existingUser) {
-    //   throw new Error('User with this email already exists');
-    // }
-    const salt = await bcrypt.genSaltSync(10);
-    const passwordHash = await bcrypt.hashSync(password, salt);
+  constructor(
+    @InjectModel(UserModel) private userModel: typeof UserModel,
+    private readonly jwtService: JwtService,
+  ) {}
+
+  async createUser(dto: AuthDto): Promise<UserModel> {
+    const { login, password } = dto;
+    const salt = await genSalt(10);
+    const email = login;
+    const passwordHash = await hash(password, salt);
     const newUser = await this.userModel.create({ email, passwordHash });
     return newUser;
   }
-  async findUser(email: string): Promise<User> {
+  async findUser(email: string): Promise<UserModel> {
     const user = await this.userModel.findOne({ where: { email } });
     return user;
+  }
+
+  async validateUser(
+    email: string,
+    password: string,
+  ): Promise<Pick<UserModel, 'email'>> {
+    const user = await this.findUser(email);
+    if (!user) {
+      throw new UnauthorizedException(USER_NOT_FOUND_ERROR);
+    }
+    const isCorrectPassword = await compare(password, user.passwordHash);
+    if (!isCorrectPassword) {
+      throw new UnauthorizedException(WRONG_PASSWORD_ERROR);
+    }
+    return { email: user.email };
+  }
+
+  async login(email: string) {
+    const payload = { email };
+    return {
+      access_token: await this.jwtService.signAsync(payload),
+    };
   }
 }
