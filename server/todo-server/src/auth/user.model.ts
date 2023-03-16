@@ -1,5 +1,5 @@
 import { Table, Column, DataType, HasMany } from 'sequelize-typescript';
-import { BaseModel } from 'src/base.model';
+import { BaseModel } from '../base.model';
 import { TodoModel } from '../todo/todo.model';
 
 @Table

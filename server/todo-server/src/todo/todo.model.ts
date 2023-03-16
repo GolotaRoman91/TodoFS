@@ -7,7 +7,7 @@ import {
   BelongsTo,
   Length,
 } from 'sequelize-typescript';
-import { BaseModel } from 'src/base.model';
+import { BaseModel } from '../base.model';
 import { UserModel } from '../auth/user.model';
 
 @Table({
