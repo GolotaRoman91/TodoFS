@@ -1,14 +1,16 @@
-import { Table, Column, Model, DataType, HasMany } from 'sequelize-typescript';
+import { Table, Column, DataType, HasMany } from 'sequelize-typescript';
+import { BaseModel } from 'src/base.model';
 import { TodoModel } from '../todo/todo.model';
 
 @Table
-export class UserModel extends Model<UserModel> {
+export class UserModel extends BaseModel {
   @Column({
-    type: DataType.INTEGER,
+    type: DataType.UUID,
     primaryKey: true,
-    autoIncrement: true,
+    defaultValue: DataType.UUIDV4,
+    allowNull: false,
   })
-  id: number;
+  id: string;
 
   @Column({
     type: DataType.STRING,

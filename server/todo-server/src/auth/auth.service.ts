@@ -9,7 +9,7 @@ import { UserModel } from './user.model';
 @Injectable()
 export class AuthService {
   constructor(
-    @InjectModel(UserModel) private userModel: typeof UserModel,
+    @InjectModel(UserModel) private readonly userModel: typeof UserModel,
     private readonly jwtService: JwtService,
   ) {}
 
@@ -18,7 +18,12 @@ export class AuthService {
     const salt = await genSalt(10);
     const email = login;
     const passwordHash = await hash(password, salt);
-    const newUser = await this.userModel.create({ email, passwordHash });
+    const newUser = await this.userModel.create({
+      email,
+      passwordHash,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
     return newUser;
   }
   async findUser(email: string): Promise<UserModel> {

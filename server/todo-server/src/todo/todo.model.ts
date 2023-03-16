@@ -2,19 +2,19 @@ import { IsOptional } from 'class-validator';
 import {
   Table,
   Column,
-  Model,
   DataType,
   ForeignKey,
   BelongsTo,
   Length,
 } from 'sequelize-typescript';
+import { BaseModel } from 'src/base.model';
 import { UserModel } from '../auth/user.model';
 
 @Table({
   tableName: 'todos',
   timestamps: true,
 })
-export class TodoModel extends Model {
+export class TodoModel extends BaseModel {
   @Column({
     type: DataType.INTEGER,
     primaryKey: true,
