@@ -26,7 +26,7 @@ describe('AppController (e2e)', () => {
 
   it('/auth/register (POST) - create a new user', async () => {
     const userData = {
-      login: 'JestTestuser1@example.com',
+      login: 'JestTestuser2@example.com',
       password: 'testpassword',
     };
 
@@ -35,8 +35,8 @@ describe('AppController (e2e)', () => {
       .send(userData)
       .expect(201);
 
-    expect(body).toHaveProperty('id');
     createdUserId = body.id;
+    expect(body).toHaveProperty('id', createdUserId);
     expect(body).toHaveProperty('email', userData.login);
     expect(body).toHaveProperty('createdAt');
     expect(body).toHaveProperty('updatedAt');
