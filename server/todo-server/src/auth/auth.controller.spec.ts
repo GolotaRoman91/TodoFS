@@ -1,6 +1,9 @@
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, UnauthorizedException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import { ALREADY_REGISTERED_ERROR } from './auth.constants';
+import {
+  ALREADY_REGISTERED_ERROR,
+  WRONG_PASSWORD_ERROR,
+} from './auth.constants';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { AuthDto } from './dto/auth.dto';
@@ -33,32 +36,28 @@ describe('AuthController', () => {
       jest.clearAllMocks();
     });
 
-    it('should call findUser when registering a new user', async () => {
+    it('should call createUser when registering a new user', async () => {
       const testDto: AuthDto = {
         login: 'test@example.com',
         password: 'testpassword',
       };
 
-      authServiceMock.findUser.mockResolvedValue(null);
+      authServiceMock.createUser.mockResolvedValue(null);
 
       await controller.register(testDto);
 
-      expect(authServiceMock.findUser).toHaveBeenCalledWith(testDto.login);
+      expect(authServiceMock.createUser).toHaveBeenCalledWith(testDto);
     });
 
-    it('should successfully find an existing user', async () => {
+    it('should throw an error when registering an existing user', async () => {
       const testDto: AuthDto = {
         login: 'test@email.com',
         password: 'password',
       };
 
-      const userMock = {
-        id: 1,
-        login: testDto.login,
-        password: testDto.password,
-      };
-
-      authServiceMock.findUser.mockResolvedValue(userMock);
+      authServiceMock.createUser.mockImplementation(() => {
+        throw new BadRequestException(ALREADY_REGISTERED_ERROR);
+      });
 
       try {
         await controller.register(testDto);
@@ -66,7 +65,7 @@ describe('AuthController', () => {
         expect(error.message).toEqual(ALREADY_REGISTERED_ERROR);
       }
 
-      expect(authServiceMock.findUser).toHaveBeenCalledWith(testDto.login);
+      expect(authServiceMock.createUser).toHaveBeenCalledWith(testDto);
     });
 
     it('should successfully create a new user', async () => {
@@ -96,13 +95,9 @@ describe('AuthController', () => {
         password: 'password',
       };
 
-      const userMock = {
-        id: 1,
-        login: testDto.login,
-        password: testDto.password,
-      };
-
-      authServiceMock.findUser.mockResolvedValue(userMock);
+      authServiceMock.createUser.mockImplementation(() => {
+        throw new BadRequestException(ALREADY_REGISTERED_ERROR);
+      });
 
       await expect(controller.register(testDto)).rejects.toThrowError(
         BadRequestException,
@@ -132,6 +127,23 @@ describe('AuthController', () => {
         testDto.login,
         testDto.password,
       );
+    });
+
+    it('should fail to validate a user with incorrect password', async () => {
+      const testDto: AuthDto = {
+        login: 'test@email.com',
+        password: 'wrong_password',
+      };
+
+      authServiceMock.validateUser.mockRejectedValue(
+        new UnauthorizedException(WRONG_PASSWORD_ERROR),
+      );
+
+      await expect(controller.login(testDto)).rejects.toThrowError();
+      await expect(controller.login(testDto)).rejects.toMatchObject({
+        message: WRONG_PASSWORD_ERROR,
+        constructor: UnauthorizedException,
+      });
     });
   });
 });

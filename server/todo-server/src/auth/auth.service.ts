@@ -1,8 +1,16 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectModel } from '@nestjs/sequelize';
 import { genSalt, hash, compare } from 'bcryptjs';
-import { USER_NOT_FOUND_ERROR, WRONG_PASSWORD_ERROR } from './auth.constants';
+import {
+  ALREADY_REGISTERED_ERROR,
+  USER_NOT_FOUND_ERROR,
+  WRONG_PASSWORD_ERROR,
+} from './auth.constants';
 import { AuthDto } from './dto/auth.dto';
 import { UserModel } from './user.model';
 
@@ -15,6 +23,10 @@ export class AuthService {
 
   async createUser(dto: AuthDto): Promise<UserModel> {
     const { login, password } = dto;
+    const oldUser = await this.findUser(dto.login);
+    if (oldUser) {
+      throw new BadRequestException(ALREADY_REGISTERED_ERROR);
+    }
     const salt = await genSalt(10);
     const email = login;
     const passwordHash = await hash(password, salt);
@@ -26,6 +38,7 @@ export class AuthService {
     });
     return newUser;
   }
+
   async findUser(email: string): Promise<UserModel> {
     const user = await this.userModel.findOne({ where: { email } });
     return user;
