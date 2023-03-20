@@ -1,7 +1,5 @@
 import { TodoModel } from './todo/todo.model';
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { databaseProvider } from './configs/database.config';
@@ -17,7 +15,7 @@ import { TodoModule } from './todo/todo.module';
     AuthModule,
     TodoModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [],
+  providers: [],
 })
 export class AppModule {}

@@ -4,7 +4,7 @@ import { TodoService } from './todo.service';
 import { TodoController } from './todo.controller';
 import { TodoModel } from './todo.model';
 import { SequelizeModule } from '@nestjs/sequelize';
-import { AuthModule } from 'src/auth/auth.module';
+import { AuthModule } from '../auth/auth.module';
 
 @Module({
   imports: [SequelizeModule.forFeature([TodoModel, UserModel]), AuthModule],

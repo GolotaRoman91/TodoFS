@@ -11,8 +11,8 @@ import {
 import { TodoService } from './todo.service';
 import { CreateTodoDto } from './dto/create-todo.dto';
 import { UpdateTodoDto } from './dto/update-todo.dto';
-import { JwtAuthGuard } from 'src/auth/guards/jwt.guards';
-import { UserEmail } from 'src/decorators/user-email.decorator';
+import { JwtAuthGuard } from '../auth/guards/jwt.guards';
+import { UserEmail } from '../decorators/user-email.decorator';
 
 @Controller('/todos')
 export class TodoController {
