@@ -52,8 +52,8 @@ describe('AuthService', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         AuthService,
-        { provide: getModelToken(UserModel), useValue: userModelMock }, // замена зависимости на мок
-        { provide: JwtService, useValue: jwtServiceMock }, // замена зависимости на мок
+        { provide: getModelToken(UserModel), useValue: userModelMock },
+        { provide: JwtService, useValue: jwtServiceMock },
       ],
     }).compile();
 
