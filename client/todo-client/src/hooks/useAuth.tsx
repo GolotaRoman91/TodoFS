@@ -18,7 +18,10 @@ const useAuth = () => {
     const [isLogin, setIsLogin] = useState(true);
     const navigate = useNavigate();
 
-    const loginUser = async ({ login, password }: Credentials) => {
+    const loginUser = async (
+        { login, password }: Credentials,
+        email: string
+    ) => {
         try {
             const response = await fetch("http://localhost:3333/auth/login", {
                 method: "POST",
@@ -34,11 +37,12 @@ const useAuth = () => {
             if (response.ok) {
                 const data: AuthResponse = await response.json();
                 localStorage.setItem("access_token", data.access_token);
-                console.log("Токен:", data.access_token);
+                localStorage.setItem("user_email", email);
+                console.log("Token:", data.access_token);
                 navigate("/main");
             } else {
                 const error: ErrorResponse = await response.json();
-                throw new Error(error.message || "Не удалось выполнить вход");
+                throw new Error(error.message || "Failed to log in");
             }
         } catch (error: unknown) {
             let errorMessage: string;
@@ -46,7 +50,7 @@ const useAuth = () => {
             if (error instanceof Error) {
                 errorMessage = error.message;
             } else {
-                errorMessage = "Неизвестная ошибка";
+                errorMessage = "Unknown error";
             }
 
             throw new Error(errorMessage);
@@ -70,12 +74,10 @@ const useAuth = () => {
             );
 
             if (response.ok) {
-                console.log("Регистрация прошла успешно");
+                console.log("Registration successful");
             } else {
                 const error: ErrorResponse = await response.json();
-                throw new Error(
-                    error.message || "Не удалось зарегистрироваться"
-                );
+                throw new Error(error.message || "Failed to register");
             }
         } catch (error: unknown) {
             let errorMessage: string;
@@ -83,7 +85,7 @@ const useAuth = () => {
             if (error instanceof Error) {
                 errorMessage = error.message;
             } else {
-                errorMessage = "Неизвестная ошибка";
+                errorMessage = "Unknown error";
             }
 
             throw new Error(errorMessage);

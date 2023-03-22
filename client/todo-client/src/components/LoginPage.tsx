@@ -22,17 +22,17 @@ const AuthPage = () => {
         const password = event.currentTarget.password.value;
 
         try {
-            await loginUser({ login: email, password });
+            await loginUser({ login: email, password }, email);
             toast({
-                title: "Успешный вход",
-                description: "Вы успешно вошли в систему",
+                title: "Login successful",
+                description: "You have successfully logged in",
                 status: "success",
                 duration: 3000,
                 isClosable: true,
             });
         } catch (error) {
             toast({
-                title: "Ошибка входа",
+                title: "Login error",
                 description: (error as Error).message,
                 status: "error",
                 isClosable: true,
@@ -49,25 +49,24 @@ const AuthPage = () => {
         try {
             await registerUser({ login: email, password });
             toast({
-                title: "Успешная регистрация",
-                description: "Вы успешно зарегистрировались",
+                title: "Registration successful",
+                description: "You have successfully registered",
                 status: "success",
                 isClosable: true,
             });
         } catch (error) {
             toast({
-                title: "Ошибка входа",
+                title: "Registration error",
                 description: (error as Error).message,
                 status: "error",
                 isClosable: true,
             });
         }
     };
-
     return (
         <Box maxWidth="md" mx="auto">
             <Heading textAlign="center" my={12}>
-                {isLogin ? "Войти" : "Регистрация"}
+                {isLogin ? "Login" : "Register"}
             </Heading>
             <Box bg="gray.100" py={5} px={8} borderRadius="lg">
                 <form onSubmit={isLogin ? handleLogin : handleRegister}>
@@ -83,7 +82,7 @@ const AuthPage = () => {
                             />
                         </FormControl>
                         <FormControl>
-                            <FormLabel>Пароль</FormLabel>
+                            <FormLabel>Password</FormLabel>
                             <Input
                                 type="password"
                                 id="password"
@@ -93,7 +92,7 @@ const AuthPage = () => {
                             />
                         </FormControl>
                         <Button type="submit" colorScheme="blue" width="full">
-                            {isLogin ? "Войти" : "Зарегистрироваться"}
+                            {isLogin ? "Login" : "Register"}
                         </Button>
                     </Stack>
                 </form>
@@ -105,8 +104,8 @@ const AuthPage = () => {
                 mt={4}
             >
                 {isLogin
-                    ? "У вас нет аккаунта? Зарегистрироваться"
-                    : "Уже зарегистрированы? Войти"}
+                    ? "Don't have an account? Register"
+                    : "Already registered? Login"}
             </Button>
         </Box>
     );
