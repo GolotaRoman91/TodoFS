@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
     Box,
     Input,
@@ -25,7 +25,7 @@ const TodoList: React.FC = () => {
         }
     };
 
-    React.useEffect(() => {
+    useEffect(() => {
         if (error) {
             toast({
                 title: "Error",
