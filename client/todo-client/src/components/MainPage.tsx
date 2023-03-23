@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { Box, Text, Button, Flex } from "@chakra-ui/react";
+import TodoList from "./TodoList";
 
 const MainPage = () => {
     const navigate = useNavigate();
@@ -34,6 +35,7 @@ const MainPage = () => {
                     </Button>
                 </Flex>
             </Flex>
+            <TodoList />
         </Box>
     );
 };
