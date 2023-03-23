@@ -1,4 +1,3 @@
-import React, { useState, useEffect } from "react";
 import {
     Box,
     Button,
@@ -8,59 +7,57 @@ import {
     Stack,
     Heading,
     useToast,
+    UseToastOptions,
 } from "@chakra-ui/react";
+import { useState } from "react";
 import useAuth from "../hooks/useAuth";
 
 const AuthPage = () => {
     const { isLogin, setIsLogin, loginUser, registerUser } = useAuth();
     const toast = useToast();
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+
+    const showToast = (
+        title: string,
+        description: string,
+        status: UseToastOptions["status"]
+    ) => {
+        toast({
+            title,
+            description,
+            status,
+            isClosable: true,
+        });
+    };
 
     const handleLogin = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
 
-        const email = event.currentTarget.email.value;
-        const password = event.currentTarget.password.value;
-
         try {
             await loginUser({ login: email, password }, email);
-            toast({
-                title: "Login successful",
-                description: "You have successfully logged in",
-                status: "success",
-                duration: 3000,
-                isClosable: true,
-            });
+            showToast(
+                "Login successful",
+                "You have successfully logged in",
+                "success"
+            );
         } catch (error) {
-            toast({
-                title: "Login error",
-                description: (error as Error).message,
-                status: "error",
-                isClosable: true,
-            });
+            showToast("Login error", (error as Error).message, "error");
         }
     };
 
     const handleRegister = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
 
-        const email = event.currentTarget.email.value;
-        const password = event.currentTarget.password.value;
-
         try {
             await registerUser({ login: email, password });
-            toast({
-                title: "Registration successful",
-                description: "You have successfully registered",
-                status: "success",
-                isClosable: true,
-            });
+            showToast(
+                "Registration successful",
+                "You have successfully registered",
+                "success"
+            );
         } catch (error) {
-            toast({
-                title: "Registration error",
-                description: (error as Error).message,
-                status: "error",
-                isClosable: true,
-            });
+            showToast("Registration error", (error as Error).message, "error");
         }
     };
     return (
@@ -79,6 +76,8 @@ const AuthPage = () => {
                                 name="email"
                                 autoComplete="email"
                                 isRequired
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
                             />
                         </FormControl>
                         <FormControl>
@@ -89,6 +88,8 @@ const AuthPage = () => {
                                 name="password"
                                 autoComplete="current-password"
                                 isRequired
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
                             />
                         </FormControl>
                         <Button type="submit" colorScheme="blue" width="full">
