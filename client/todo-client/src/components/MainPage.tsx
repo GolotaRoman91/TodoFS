@@ -1,16 +1,12 @@
 import { useNavigate } from "react-router-dom";
 import { Box, Text, Button, Flex } from "@chakra-ui/react";
 import TodoList from "./TodoList";
+import useLogout from "../hooks/useLogout";
 
 const MainPage = () => {
     const navigate = useNavigate();
     const userEmail = localStorage.getItem("user_email") || "Unknown user";
-
-    const handleLogout = () => {
-        localStorage.removeItem("access_token");
-        localStorage.removeItem("user_email");
-        navigate("/login");
-    };
+    const logout = useLogout(navigate);
 
     return (
         <Box>
@@ -26,7 +22,7 @@ const MainPage = () => {
                 <Flex alignItems="center">
                     <Text>{userEmail}</Text>
                     <Button
-                        onClick={handleLogout}
+                        onClick={logout}
                         ml={4}
                         colorScheme="red"
                         variant="solid"

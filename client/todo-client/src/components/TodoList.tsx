@@ -5,12 +5,11 @@ import {
     Button,
     VStack,
     HStack,
-    Text,
-    Checkbox,
     Spinner,
     useToast,
 } from "@chakra-ui/react";
 import useTodos from "../hooks/useTodos";
+import TodoItem from "./TodoItem";
 
 const TodoList: React.FC = () => {
     const { todos, loading, error, addTodo, removeTodo, updateTodoCompletion } =
@@ -18,7 +17,8 @@ const TodoList: React.FC = () => {
     const [inputValue, setInputValue] = useState("");
     const toast = useToast();
 
-    const handleAddTodo = () => {
+    const handleAddTodo = (event: React.FormEvent) => {
+        event.preventDefault();
         if (inputValue) {
             addTodo(inputValue, "");
             setInputValue("");
@@ -42,46 +42,25 @@ const TodoList: React.FC = () => {
                 <Spinner />
             ) : (
                 <VStack spacing={4}>
-                    <HStack>
-                        <Input
-                            value={inputValue}
-                            onChange={(e) => setInputValue(e.target.value)}
-                            placeholder="Enter a todo"
-                        />
-                        <Button onClick={handleAddTodo} colorScheme="blue">
-                            Add
-                        </Button>
-                    </HStack>
-                    {todos.map((todo) => (
-                        <HStack
-                            key={todo.id}
-                            w="100%"
-                            justifyContent="space-between"
-                        >
-                            <Checkbox
-                                isChecked={todo.completed}
-                                onChange={() =>
-                                    updateTodoCompletion(
-                                        todo.id,
-                                        !todo.completed
-                                    )
-                                }
+                    <form onSubmit={handleAddTodo}>
+                        <HStack>
+                            <Input
+                                value={inputValue}
+                                onChange={(e) => setInputValue(e.target.value)}
+                                placeholder="Enter a todo"
                             />
-                            <Text
-                                textDecoration={
-                                    todo.completed ? "line-through" : "none"
-                                }
-                                transition="text-decoration 0.5s"
-                            >
-                                {todo.title}
-                            </Text>
-                            <Button
-                                onClick={() => removeTodo(todo.id)}
-                                colorScheme="red"
-                            >
-                                Remove
+                            <Button type="submit" colorScheme="blue">
+                                Add
                             </Button>
                         </HStack>
+                    </form>
+                    {todos.map((todo) => (
+                        <TodoItem
+                            key={todo.id}
+                            todo={todo}
+                            updateTodoCompletion={updateTodoCompletion}
+                            removeTodo={removeTodo}
+                        />
                     ))}
                 </VStack>
             )}
