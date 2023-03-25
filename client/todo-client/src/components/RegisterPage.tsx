@@ -9,28 +9,28 @@ import {
     Heading,
 } from "@chakra-ui/react";
 
-interface LoginPageProps {
+interface RegisterPageProps {
     email: string;
     password: string;
     setEmail: (email: string) => void;
     setPassword: (password: string) => void;
-    handleLogin: (event: React.FormEvent<HTMLFormElement>) => void;
+    handleRegister: (event: React.FormEvent<HTMLFormElement>) => void;
 }
 
-const LoginPage: React.FC<LoginPageProps> = ({
+const RegisterPage: React.FC<RegisterPageProps> = ({
     email,
     password,
     setEmail,
     setPassword,
-    handleLogin,
+    handleRegister,
 }) => {
     return (
         <Box maxWidth="md" mx="auto">
             <Heading textAlign="center" my={12}>
-                Login
+                Register
             </Heading>
             <Box bg="gray.100" py={5} px={8} borderRadius="lg">
-                <form onSubmit={handleLogin}>
+                <form onSubmit={handleRegister}>
                     <Stack spacing={3}>
                         <FormControl>
                             <FormLabel>Email</FormLabel>
@@ -57,7 +57,7 @@ const LoginPage: React.FC<LoginPageProps> = ({
                             />
                         </FormControl>
                         <Button type="submit" colorScheme="blue" width="full">
-                            Login
+                            Register
                         </Button>
                     </Stack>
                 </form>
@@ -66,4 +66,4 @@ const LoginPage: React.FC<LoginPageProps> = ({
     );
 };
 
-export default LoginPage;
+export default RegisterPage;

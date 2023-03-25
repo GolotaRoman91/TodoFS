@@ -1,8 +1,7 @@
-import { Route, Routes, Link, BrowserRouter } from "react-router-dom";
-import HomePage from "./components/MainPage";
-import LoginPage from "./components/LoginPage";
+import { Route, Routes, BrowserRouter } from "react-router-dom";
 import MainPage from "./components/MainPage";
 import PrivateRoutes from "./utils/PrivateRoute";
+import AuthPage from "./components/AuthPage";
 
 const App = () => {
     return (
@@ -11,7 +10,7 @@ const App = () => {
                 <Route path="/" element={<PrivateRoutes />}>
                     <Route path="/main" element={<MainPage />} />
                 </Route>
-                <Route path="/login" element={<LoginPage />} />
+                <Route path="/login" element={<AuthPage />} />
             </Routes>
         </BrowserRouter>
     );
