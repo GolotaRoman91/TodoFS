@@ -1,29 +1,13 @@
-import React, { useEffect, useState } from "react";
-import {
-    Box,
-    Input,
-    Button,
-    VStack,
-    HStack,
-    Spinner,
-    useToast,
-} from "@chakra-ui/react";
+import React, { useEffect } from "react";
+import { Box, VStack, Spinner, useToast } from "@chakra-ui/react";
 import useTodos from "../hooks/useTodos";
 import TodoItem from "./TodoItem";
+import AddTodoForm from "./AddTodoForm";
 
 const TodoList: React.FC = () => {
     const { todos, loading, error, addTodo, removeTodo, updateTodoCompletion } =
         useTodos();
-    const [inputValue, setInputValue] = useState("");
     const toast = useToast();
-
-    const handleAddTodo = (event: React.FormEvent) => {
-        event.preventDefault();
-        if (inputValue) {
-            addTodo(inputValue, "");
-            setInputValue("");
-        }
-    };
 
     useEffect(() => {
         if (error) {
@@ -42,18 +26,7 @@ const TodoList: React.FC = () => {
                 <Spinner />
             ) : (
                 <VStack spacing={4}>
-                    <form onSubmit={handleAddTodo}>
-                        <HStack>
-                            <Input
-                                value={inputValue}
-                                onChange={(e) => setInputValue(e.target.value)}
-                                placeholder="Enter a todo"
-                            />
-                            <Button type="submit" colorScheme="blue">
-                                Add
-                            </Button>
-                        </HStack>
-                    </form>
+                    <AddTodoForm onAddTodo={addTodo} />
                     {todos.map((todo) => (
                         <TodoItem
                             key={todo.id}
