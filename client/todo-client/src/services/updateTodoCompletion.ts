@@ -1,24 +1,26 @@
-import { Dispatch, SetStateAction } from "react";
 import { Todo } from "../types/Todo";
 
-const updateTodoCompletion = async (
+async function updateTodoCompletion(
     todos: Todo[],
-    setTodos: Dispatch<SetStateAction<Todo[]>>,
-    setError: (error: Error | null) => void,
     id: number,
     completed: boolean
-) => {
-    const token = localStorage.getItem("access_token");
+): Promise<{ updatedTodos?: Todo[]; error?: Error; loading: boolean }> {
+    let updatedTodos: Todo[] | undefined;
+    let error: Error | undefined;
+    let loading = true;
 
+    const token = localStorage.getItem("access_token");
     if (!token) {
-        setError(new Error("User is not authenticated"));
-        return;
+        error = new Error("User is not authenticated");
+        loading = false;
+        return { error, loading };
     }
 
     const todoToUpdate = todos.find((todo) => todo.id === id);
     if (!todoToUpdate) {
-        setError(new Error("Todo not found"));
-        return;
+        error = new Error("Todo not found");
+        loading = false;
+        return { error, loading };
     }
 
     const updatedTodoData = {
@@ -41,15 +43,16 @@ const updateTodoCompletion = async (
         }
 
         const updatedTodo = await response.json();
-
-        setTodos((prevTodos) =>
-            prevTodos.map((todo) =>
-                todo.id === updatedTodo.id ? updatedTodo : todo
-            )
+        updatedTodos = todos.map((todo) =>
+            todo.id === updatedTodo.id ? updatedTodo : todo
         );
     } catch (err) {
-        setError(err as Error);
+        error = err as Error;
+    } finally {
+        loading = false;
     }
-};
+
+    return { updatedTodos, error, loading };
+}
 
 export default updateTodoCompletion;

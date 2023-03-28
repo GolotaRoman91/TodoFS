@@ -14,11 +14,31 @@ const useTodos = () => {
         id: number,
         completed: boolean
     ) => {
-        await updateTodoCompletion(todos, setTodos, setError, id, completed);
+        const { updatedTodos, error, loading } = await updateTodoCompletion(
+            todos,
+            id,
+            completed
+        );
+
+        if (updatedTodos) {
+            setTodos(updatedTodos);
+        }
+
+        setError(error as Error);
+        setLoading(loading);
     };
 
-    const wrappedRemoveTodo = (id: number) => {
-        removeTodo(setTodos, setError, setLoading, id);
+    const wrappedRemoveTodo = async (id: number) => {
+        const { removedTodoId, error, loading } = await removeTodo(id);
+
+        if (removedTodoId !== undefined) {
+            setTodos((prevTodos) =>
+                prevTodos.filter((todo) => todo.id !== removedTodoId)
+            );
+        }
+
+        setError(error as Error);
+        setLoading(loading);
     };
 
     const wrappedAddTodo = async (title: string, description: string) => {
@@ -38,17 +58,17 @@ const useTodos = () => {
     useEffect(() => {
         const fetchAndSetTodos = async () => {
             setLoading(true);
-            const { data, error } = await fetchTodos();
+            const { data, error, loading } = await fetchTodos();
 
             if (data) {
                 setTodos(data);
             }
 
             if (error) {
-                setError(error);
+                setError(error as Error);
             }
 
-            setLoading(false);
+            setLoading(loading);
         };
 
         fetchAndSetTodos();

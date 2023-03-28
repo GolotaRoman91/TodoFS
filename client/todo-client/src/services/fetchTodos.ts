@@ -5,6 +5,7 @@ const fetchTodos = async () => {
         return {
             data: null,
             error: new Error("User is not authenticated"),
+            loading: false,
         };
     }
 
@@ -20,14 +21,17 @@ const fetchTodos = async () => {
         }
 
         const data = await response.json();
+
         return {
             data,
             error: null,
+            loading: false,
         };
-    } catch (err) {
+    } catch (error) {
         return {
             data: null,
-            error: err as Error,
+            error,
+            loading: false,
         };
     }
 };
