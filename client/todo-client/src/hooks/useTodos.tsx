@@ -22,7 +22,17 @@ const useTodos = () => {
     };
 
     const wrappedAddTodo = async (title: string, description: string) => {
-        await addTodo(setTodos, setError, setLoading, title, description);
+        const { newTodo, error, loading } = await addTodo({
+            title,
+            description,
+        });
+
+        if (newTodo) {
+            setTodos((prevTodos) => [...prevTodos, newTodo]);
+        }
+
+        setError(error as Error);
+        setLoading(loading);
     };
 
     useEffect(() => {

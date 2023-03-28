@@ -1,20 +1,27 @@
-import { Dispatch, SetStateAction } from "react";
 import { Todo } from "../types/Todo";
 
-const addTodo = async (
-    setTodos: Dispatch<SetStateAction<Todo[]>>,
-    setError: (error: Error | null) => void,
-    setLoading: (loading: boolean) => void,
-    title: string,
-    description: string
-) => {
-    setLoading(true);
-    const token = localStorage.getItem("access_token");
+interface AddTodoOptions {
+    title: string;
+    description: string;
+}
 
+async function addTodo({
+    title,
+    description,
+}: AddTodoOptions): Promise<{
+    newTodo?: Todo;
+    error?: Error;
+    loading: boolean;
+}> {
+    let newTodo: Todo | undefined;
+    let error: Error | undefined;
+    let loading = true;
+
+    const token = localStorage.getItem("access_token");
     if (!token) {
-        setError(new Error("User is not authenticated"));
-        setLoading(false);
-        return;
+        error = new Error("User is not authenticated");
+        loading = false;
+        return { error, loading };
     }
 
     try {
@@ -25,8 +32,8 @@ const addTodo = async (
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
-                title: title,
-                description: description,
+                title,
+                description,
                 completed: false,
             }),
         });
@@ -35,13 +42,14 @@ const addTodo = async (
             throw new Error("Failed to add todo");
         }
 
-        const newTodo = await response.json();
-        setTodos((prevTodos) => [...prevTodos, newTodo]);
+        newTodo = await response.json();
     } catch (err) {
-        setError(err as Error);
+        error = err as Error;
     } finally {
-        setLoading(false);
+        loading = false;
     }
-};
+
+    return { newTodo, error, loading };
+}
 
 export default addTodo;
