@@ -5,6 +5,7 @@
     "type": "module",
     "scripts": {
         "test": "jest --config=jest.config.cjs",
+        "test-useAuth": "jest --testPathPattern useAuth",
         "dev": "vite",
         "build": "tsc && vite build",
         "preview": "vite preview"
