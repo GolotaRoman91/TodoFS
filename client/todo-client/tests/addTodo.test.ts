@@ -1,134 +1,88 @@
-import React from "react";
-import { act } from "react-dom/test-utils";
-import { renderHook } from "@testing-library/react-hooks";
 import addTodo from "../src/services/addTodo";
-import { Todo } from "../src/types/Todo";
-
-const mockLocalStorage = () => {
-    let store: { [key: string]: string } = {};
-
-    return {
-        getItem: (key: string) => store[key] || null,
-        setItem: (key: string, value: string) => {
-            store[key] = value;
-        },
-        removeItem: (key: string) => {
-            delete store[key];
-        },
-        clear: () => {
-            store = {};
-        },
-    };
-};
+import * as nock from "nock";
+import "cross-fetch/polyfill";
 
 describe("addTodo", () => {
-    let todos: Todo[] = [];
-    let error: Error | null = null;
-    let loading: boolean = false;
+    const mockApi = "http://localhost:3333";
+    const validToken = "valid_token";
+    const invalidToken = "invalid_token";
 
     beforeEach(() => {
-        Object.defineProperty(window, "localStorage", {
-            value: mockLocalStorage(),
-        });
-
-        todos = [];
-        error = null;
-        loading = false;
+        localStorage.setItem("access_token", validToken);
     });
 
-    it("adds a new todo item", async () => {
-        const setTodos: React.Dispatch<React.SetStateAction<Todo[]>> = (
-            newTodos
-        ) => {
-            todos = newTodos as Todo[];
-        };
-        const setError = (newError: Error | null) => {
-            error = newError;
-        };
-        const setLoading = (newLoading: boolean) => {
-            loading = newLoading;
-        };
+    afterEach(() => {
+        nock.cleanAll();
+        localStorage.clear();
+    });
 
-        const mockSuccessResponse = {
+    it("should add a new todo successfully", async () => {
+        const newTodo = {
             id: 1,
-            title: "Test todo",
-            description: "",
+            title: "Test title",
+            description: "Test description",
             completed: false,
         };
-        const mockFetch = jest.fn().mockResolvedValue({
-            ok: true,
-            json: () => Promise.resolve(mockSuccessResponse),
+
+        nock(mockApi)
+            .post("/todos", {
+                title: newTodo.title,
+                description: newTodo.description,
+                completed: false,
+            })
+            .reply(200, newTodo);
+
+        const result = await addTodo({
+            title: newTodo.title,
+            description: newTodo.description,
         });
-        global.fetch = mockFetch as any;
 
-        localStorage.setItem("access_token", "fake_token");
+        const { newTodo: createdTodo, error, loading } = result;
 
-        await act(async () => {
-            await addTodo(setTodos, setError, setLoading, "Test todo", "");
-        });
-
+        expect(createdTodo).toEqual(newTodo);
+        expect(error).toBeUndefined();
         expect(loading).toBe(false);
-        expect(error).toBeNull();
-        expect(todos).toHaveLength(1);
-        // expect(todos[0]).toEqual(mockSuccessResponse);
-        expect(mockFetch).toHaveBeenCalledTimes(1);
     });
 
-    it("handles error when adding a new todo item", async () => {
-        const setTodos: React.Dispatch<React.SetStateAction<Todo[]>> = (
-            newTodos
-        ) => {
-            todos = newTodos as Todo[];
-        };
-        const setError = (newError: Error | null) => {
-            error = newError;
-        };
-        const setLoading = (newLoading: boolean) => {
-            loading = newLoading;
-        };
-
-        const mockErrorResponse = { message: "Failed to add todo" };
-        const mockFetch = jest.fn().mockResolvedValue({
-            ok: false,
-            json: () => Promise.resolve(mockErrorResponse),
-        });
-        global.fetch = mockFetch as any;
-
-        localStorage.setItem("access_token", "fake_token");
-
-        await act(async () => {
-            await addTodo(setTodos, setError, setLoading, "Test todo", "");
-        });
-
-        expect(loading).toBe(false);
-        expect(error).not.toBeNull();
-        expect(error!.message).toBe("Failed to add todo");
-        expect(todos).toHaveLength(0);
-        expect(mockFetch).toHaveBeenCalledTimes(1);
-    });
-
-    it("handles error when user is not authenticated", async () => {
-        const setTodos: React.Dispatch<React.SetStateAction<Todo[]>> = (
-            newTodos
-        ) => {
-            todos = newTodos as Todo[];
-        };
-        const setError = (newError: Error | null) => {
-            error = newError;
-        };
-        const setLoading = (newLoading: boolean) => {
-            loading = newLoading;
-        };
-
+    it("should fail when not authenticated", async () => {
         localStorage.removeItem("access_token");
 
-        await act(async () => {
-            await addTodo(setTodos, setError, setLoading, "Test todo", "");
+        const { newTodo, error, loading } = await addTodo({
+            title: "Test title",
+            description: "Test description",
         });
 
+        expect(newTodo).toBeUndefined();
+        expect(error).toEqual(new Error("User is not authenticated"));
         expect(loading).toBe(false);
-        expect(error).not.toBeNull();
-        expect(error!.message).toBe("User is not authenticated");
-        expect(todos).toHaveLength(0);
+    });
+
+    it("should fail when adding todo is unsuccessful", async () => {
+        const newTodo = {
+            title: "Test title",
+            description: "Test description",
+            completed: false,
+        };
+
+        nock(mockApi, {
+            reqheaders: {
+                Authorization: `Bearer ${validToken}`,
+            },
+        })
+            .post("/todos", newTodo)
+            .reply(400);
+
+        const {
+            newTodo: createdTodo,
+            error,
+            loading,
+        } = await addTodo({
+            title: newTodo.title,
+            description: newTodo.description,
+        });
+
+        expect(createdTodo).toBeUndefined();
+        expect(error).toEqual(new Error("Failed to add todo"));
+        expect(loading).toBe(false);
     });
 });
