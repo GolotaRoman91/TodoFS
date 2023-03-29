@@ -5,7 +5,6 @@ import "cross-fetch/polyfill";
 describe("addTodo", () => {
     const mockApi = "http://localhost:3333";
     const validToken = "valid_token";
-    const invalidToken = "invalid_token";
 
     beforeEach(() => {
         localStorage.setItem("access_token", validToken);
@@ -24,7 +23,11 @@ describe("addTodo", () => {
             completed: false,
         };
 
-        nock(mockApi)
+        nock(mockApi, {
+            reqheaders: {
+                Authorization: `Bearer ${validToken}`,
+            },
+        })
             .post("/todos", {
                 title: newTodo.title,
                 description: newTodo.description,
