@@ -1,5 +1,4 @@
 import { renderHook, act } from "@testing-library/react-hooks";
-import { useNavigate } from "react-router-dom";
 import { loginUser } from "../src/services/loginUser";
 import { registerUser } from "../src/services/registerUser";
 import useAuth from "../src/hooks/useAuth";
