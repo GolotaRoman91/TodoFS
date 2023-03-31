@@ -78,6 +78,7 @@ const useTodos = () => {
         todos,
         error,
         loading,
+        setTodos,
         updateTodoCompletion: wrappedUpdateTodoCompletion,
         removeTodo: wrappedRemoveTodo,
         addTodo: wrappedAddTodo,

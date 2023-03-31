@@ -7,6 +7,7 @@
         "test": "jest --config=jest.config.cjs",
         "test-useAuth": "jest --testPathPattern useAuth",
         "test-useLogout": "jest --testPathPattern useLogout",
+        "test-useTodos": "jest --testPathPattern useTodos",
         "dev": "vite",
         "build": "tsc && vite build",
         "preview": "vite preview"
@@ -25,6 +26,7 @@
         "@testing-library/jest-dom": "^5.16.5",
         "@testing-library/react": "^14.0.0",
         "@testing-library/react-hooks": "^8.0.1",
+        "@types/babel__core": "^7.20.0",
         "@types/istanbul-lib-report": "^3.0.0",
         "@types/jest": "^29.5.0",
         "@types/nock": "^11.1.0",
